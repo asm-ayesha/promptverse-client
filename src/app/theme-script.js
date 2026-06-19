@@ -1,0 +1,1 @@
+export const themeInitScript = `(function(){try{var t=localStorage.getItem("promptverse-theme");if(t!=="dark")t="light";var r=document.documentElement;r.classList.remove("light","dark");r.classList.add(t);r.setAttribute("data-theme",t);r.style.colorScheme=t;}catch(e){}})();`;
