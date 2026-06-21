@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Copy, Gem, LockOpen, Person } from "@gravity-ui/icons";
 import RatingStars from "./ui/RatingStars";
@@ -17,15 +18,17 @@ const categoryColors = {
 
 export default function PromptCard({ prompt }) {
   const gradient = categoryColors[prompt.category] || "from-indigo-400 to-cyan-400";
+  const [imgError, setImgError] = useState(false);
 
   return (
     <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm transition-shadow hover:shadow-md">
       <div className="relative h-40 w-full overflow-hidden">
-        {prompt.thumbnailUrl ? (
+        {prompt.thumbnailUrl && !imgError ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={prompt.thumbnailUrl}
             alt={prompt.title}
+            onError={() => setImgError(true)}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
