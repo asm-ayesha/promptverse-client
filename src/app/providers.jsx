@@ -1,6 +1,11 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useSyncExternalStore,
+} from "react";
 
 export const THEME_STORAGE_KEY = "promptverse-theme";
 const THEMES = new Set(["light", "dark"]);
@@ -9,6 +14,41 @@ const ThemeContext = createContext({
   theme: "light",
   setTheme: () => {},
 });
+
+const themeListeners = new Set();
+
+function emitThemeChange() {
+  themeListeners.forEach((listener) => listener());
+}
+
+function subscribeTheme(listener) {
+  themeListeners.add(listener);
+
+  const onStorage = (event) => {
+    if (event.key === THEME_STORAGE_KEY) {
+      listener();
+    }
+  };
+
+  window.addEventListener("storage", onStorage);
+
+  return () => {
+    themeListeners.delete(listener);
+    window.removeEventListener("storage", onStorage);
+  };
+}
+
+function getThemeSnapshot() {
+  try {
+    return resolveTheme(localStorage.getItem(THEME_STORAGE_KEY));
+  } catch {
+    return "light";
+  }
+}
+
+function getServerThemeSnapshot() {
+  return "light";
+}
 
 function resolveTheme(theme) {
   return THEMES.has(theme) ? theme : "light";
@@ -31,17 +71,11 @@ export function useTheme() {
 }
 
 export function Providers({ children }) {
-  const [theme, setThemeState] = useState(() => {
-    if (typeof window === "undefined") {
-      return "light";
-    }
-
-    try {
-      return resolveTheme(localStorage.getItem(THEME_STORAGE_KEY));
-    } catch {
-      return "light";
-    }
-  });
+  const theme = useSyncExternalStore(
+    subscribeTheme,
+    getThemeSnapshot,
+    getServerThemeSnapshot,
+  );
 
   useEffect(() => {
     applyTheme(theme);
@@ -49,13 +83,15 @@ export function Providers({ children }) {
 
   const setTheme = (nextTheme) => {
     const resolved = resolveTheme(nextTheme);
-    setThemeState(resolved);
 
     try {
       localStorage.setItem(THEME_STORAGE_KEY, resolved);
     } catch {
       // Ignore storage errors in private browsing.
     }
+
+    applyTheme(resolved);
+    emitThemeChange();
   };
 
   return (

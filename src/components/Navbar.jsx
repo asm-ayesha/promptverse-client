@@ -84,14 +84,14 @@ const Navbar = () => {
                         Sign In
                     </Link>
 
+                    <Link href={'/register'}>
                     <Button
-                        as={Link}
-                        href="/signup"
                         className="bg-indigo-400"
                         radius="full"
                     >
                         Get Started
                     </Button>
+                    </Link>
                 </div>
 
                 {/* Mobile Actions */}
@@ -136,15 +136,15 @@ const Navbar = () => {
                         </Link>
                          <div className="block lg:hidden my-4 h-px w-full bg-indigo-900" />
 
-                        <Button
-                            as={Link}
-                            href="/signup"
+                        <Link href={'/register'}>   
+                            <Button
                             color="primary"
                             className="mt-4"
                             onPress={() => setIsOpen(false)}
                         >
                             Get Started
                         </Button>
+                        </Link>
                     </div>
                 </div>
             )}
