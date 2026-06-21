@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Magnifier, ArrowRight, Sparkles, Rocket } from "@gravity-ui/icons";
@@ -24,21 +24,33 @@ const TAG_POOL = [
   "Data Analysis",
 ];
 
+const STABLE_TAGS = TAG_POOL.slice(0, 6);
+
 function pickRandomTags(count = 6) {
   const shuffled = [...TAG_POOL].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);
 }
 
+// Cache the randomized tags once on the client so getSnapshot stays stable
+// (useSyncExternalStore re-invokes it on every render).
+let clientTags = null;
+function subscribeTags() {
+  return () => {};
+}
+function getClientTags() {
+  if (!clientTags) clientTags = pickRandomTags(6);
+  return clientTags;
+}
+function getServerTags() {
+  return STABLE_TAGS;
+}
+
 export default function HomeBanner() {
   const router = useRouter();
   const [query, setQuery] = useState("");
-  // Start with a stable subset for SSR, then randomize after mount to avoid
-  // a hydration mismatch.
-  const [tags, setTags] = useState(() => TAG_POOL.slice(0, 6));
-
-  useEffect(() => {
-    setTags(pickRandomTags(6));
-  }, []);
+  // Stable subset during SSR/hydration, then a random subset on the client —
+  // no setState-in-effect, so the React Compiler is happy.
+  const tags = useSyncExternalStore(subscribeTags, getClientTags, getServerTags);
 
   const search = (e) => {
     e.preventDefault();
