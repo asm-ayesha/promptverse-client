@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# PromptVerse Client
 
-## Getting Started
+The **PromptVerse** frontend — a marketplace for AI prompts. Built with Next.js 16
+(App Router), HeroUI, Tailwind CSS v4, better-auth, Framer Motion and Recharts.
 
-First, run the development server:
+> The backend lives in a separate repo: **promptverse-server** (Express + MongoDB).
+
+## Features
+
+- Email/password + Google authentication (better-auth on Next.js)
+- Browse, search, filter, sort and paginate prompts
+- Prompt details with copy, bookmark, review and report
+- Public vs premium (private) prompt visibility with blur + paywall
+- User / Creator / Admin dashboards
+- Creator & Admin analytics with Recharts
+- Stripe one-time ($5) premium upgrade
+- Light / dark theme with animated toggle
+- Framer Motion animations on the home page
+- Demo accounts page for quick reviewer login
+
+## Tech
+
+- Next.js 16 (App Router, Turbopack)
+- better-auth (`toNextJsHandler`, bearer plugin) + MongoDB adapter
+- Tailwind CSS v4 + HeroUI v3 design tokens
+- Native `fetch` data layer (`src/lib/api.js`) with bearer token
+- Framer Motion, Recharts, react-toastify, @stripe/stripe-js
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env   # fill in the values
+npm run dev            # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Run the **promptverse-server** alongside it (port 5000), then seed demo data:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```bash
+cd ../promptverse-server && npm run seed
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Environment variables
 
-## Learn More
+See `.env.example`. The client and server must share the same `MONGO_DB_URI`
+(database `promptverse-db`) and `BETTER_AUTH_SECRET`.
 
-To learn more about Next.js, take a look at the following resources:
+### Google OAuth
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Create credentials at [Google Cloud Console](https://console.cloud.google.com):
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Authorized JavaScript origin: `http://localhost:3000`
+- Authorized redirect URI: `http://localhost:3000/api/auth/callback/google`
 
-## Deploy on Vercel
+## Demo accounts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `admin@aiverse.com` | `123456` |
+| Creator | `creator@aiverse.com` | `123456` |
+| User | `user@aiverse.com` | `123456` |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Visit `/demo-users` to auto-fill the login form.
+
+## Auth → API flow
+
+better-auth runs only inside Next.js. After sign-in, the bearer token is stored
+and `src/lib/api.js` attaches it as `Authorization: Bearer <token>` to every
+Express API call. The server verifies the token against the shared session
+collection.
+
+## Project structure
+
+```
+src/
+├── app/                # routes (home, all-prompts, prompts/[id], dashboard/*, payment, auth)
+│   ├── api/auth/[...all]/route.js   # better-auth handler
+│   ├── error.js, not-found.js, loading.js
+├── components/         # Navbar, Footer, PromptCard, home/*, dashboard/*, ui/*
+├── hooks/useAuth.js
+└── lib/                # auth.js, auth-client.js, api.js, motion.js
+```
