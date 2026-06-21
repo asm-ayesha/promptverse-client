@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Copy, Lock, Person } from "@gravity-ui/icons";
+import { Copy, Gem, LockOpen, Person } from "@gravity-ui/icons";
 import RatingStars from "./ui/RatingStars";
 
 const categoryColors = {
@@ -30,7 +30,7 @@ export default function PromptCard({ prompt }) {
           />
         ) : (
           <div
-            className={`flex h-full w-full items-center justify-center bg-gradient-to-br ${gradient}`}
+            className={`flex h-full w-full items-center justify-center bg-linear-to-br ${gradient}`}
           >
             <span className="px-4 text-center text-lg font-semibold text-white drop-shadow">
               {prompt.aiTool}
@@ -38,10 +38,14 @@ export default function PromptCard({ prompt }) {
           </div>
         )}
         {prompt.visibility === "private" ? (
-          <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-white backdrop-blur">
-            <Lock width={12} height={12} /> Premium
+          <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-linear-to-r from-amber-500 to-orange-500 px-2.5 py-1 text-xs font-semibold text-white shadow-md">
+            <Gem width={12} height={12} /> Premium
           </span>
-        ) : null}
+        ) : (
+          <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-emerald-500/90 px-2.5 py-1 text-xs font-semibold text-white shadow-md backdrop-blur">
+            <LockOpen width={12} height={12} /> Free
+          </span>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col p-5">
