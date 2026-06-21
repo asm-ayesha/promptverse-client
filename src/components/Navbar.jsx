@@ -12,7 +12,9 @@ import { authHref } from "@/lib/navigation";
 
 const navLinks = [
   { name: "Home", href: "/" },
-  { name: "All Prompts", href: "/all-prompts" },
+  // `match` lists extra route prefixes that should also activate this link
+  // (e.g. a prompt details page keeps "All Prompts" active).
+  { name: "All Prompts", href: "/all-prompts", match: ["/prompts"] },
 ];
 
 const Navbar = () => {
@@ -21,6 +23,14 @@ const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
   const signInHref = authHref(pathname);
+
+  const matchPath = (path) =>
+    path === "/"
+      ? pathname === "/"
+      : pathname === path || pathname.startsWith(`${path}/`);
+
+  const isActive = (href, extra = []) =>
+    matchPath(href) || extra.some(matchPath);
 
   const handleLogout = async () => {
     await signOut();
@@ -49,7 +59,12 @@ const Navbar = () => {
             <li key={item.name}>
               <Link
                 href={item.href}
-                className="text-sm font-medium text-muted transition-colors hover:text-accent"
+                aria-current={isActive(item.href, item.match) ? "page" : undefined}
+                className={`text-sm font-medium transition-colors ${
+                  isActive(item.href, item.match)
+                    ? "text-accent"
+                    : "text-muted hover:text-accent"
+                }`}
               >
                 {item.name}
               </Link>
@@ -59,7 +74,12 @@ const Navbar = () => {
             <li>
               <Link
                 href="/dashboard"
-                className="text-sm font-medium text-muted transition-colors hover:text-accent"
+                aria-current={isActive("/dashboard") ? "page" : undefined}
+                className={`text-sm font-medium transition-colors ${
+                  isActive("/dashboard")
+                    ? "text-accent"
+                    : "text-muted hover:text-accent"
+                }`}
               >
                 Dashboard
               </Link>
@@ -92,13 +112,23 @@ const Navbar = () => {
             <>
               <Link
                 href={signInHref}
-                className="text-sm font-medium text-muted hover:text-accent"
+                aria-current={isActive("/login") ? "page" : undefined}
+                className={`text-sm font-medium transition-colors ${
+                  isActive("/login")
+                    ? "text-accent"
+                    : "text-muted hover:text-accent"
+                }`}
               >
                 Sign In
               </Link>
               <Link
                 href="/register"
-                className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition hover:bg-accent-hover"
+                aria-current={isActive("/register") ? "page" : undefined}
+                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                  isActive("/register")
+                    ? "bg-accent-hover text-accent-foreground ring-2 ring-focus/40"
+                    : "bg-accent text-accent-foreground hover:bg-accent-hover"
+                }`}
               >
                 Get Started
               </Link>
@@ -128,7 +158,12 @@ const Navbar = () => {
                 key={item.name}
                 href={item.href}
                 onClick={() => setIsOpen(false)}
-                className="py-3 text-foreground hover:text-accent"
+                aria-current={isActive(item.href, item.match) ? "page" : undefined}
+                className={`py-3 ${
+                  isActive(item.href, item.match)
+                    ? "font-semibold text-accent"
+                    : "text-foreground hover:text-accent"
+                }`}
               >
                 {item.name}
               </Link>
@@ -139,7 +174,12 @@ const Navbar = () => {
                 <Link
                   href="/dashboard"
                   onClick={() => setIsOpen(false)}
-                  className="py-3 text-foreground hover:text-accent"
+                  aria-current={isActive("/dashboard") ? "page" : undefined}
+                  className={`py-3 ${
+                    isActive("/dashboard")
+                      ? "font-semibold text-accent"
+                      : "text-foreground hover:text-accent"
+                  }`}
                 >
                   Dashboard
                 </Link>
@@ -155,14 +195,24 @@ const Navbar = () => {
                 <Link
                   href={signInHref}
                   onClick={() => setIsOpen(false)}
-                  className="py-3 text-foreground hover:text-accent"
+                  aria-current={isActive("/login") ? "page" : undefined}
+                  className={`py-3 ${
+                    isActive("/login")
+                      ? "font-semibold text-accent"
+                      : "text-foreground hover:text-accent"
+                  }`}
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/register"
                   onClick={() => setIsOpen(false)}
-                  className="mt-2 rounded-full bg-accent py-2 text-center text-sm font-semibold text-accent-foreground"
+                  aria-current={isActive("/register") ? "page" : undefined}
+                  className={`mt-2 rounded-full py-2 text-center text-sm font-semibold text-accent-foreground ${
+                    isActive("/register")
+                      ? "bg-accent-hover ring-2 ring-focus/40"
+                      : "bg-accent"
+                  }`}
                 >
                   Get Started
                 </Link>
