@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import {
   Copy,
@@ -13,6 +13,7 @@ import {
   Clock,
 } from "@gravity-ui/icons";
 import { apiGet, apiPost } from "@/lib/api";
+import { authHref } from "@/lib/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import RatingStars from "@/components/ui/RatingStars";
@@ -29,6 +30,7 @@ const reportReasons = [
 export default function PromptDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
+  const pathname = usePathname();
   const { isAuthenticated } = useAuth();
 
   const [prompt, setPrompt] = useState(null);
@@ -64,7 +66,7 @@ export default function PromptDetailsPage() {
 
   const requireLogin = () => {
     toast.info("Please log in to continue");
-    router.push("/login");
+    router.push(authHref(pathname));
   };
 
   const handleCopy = async () => {

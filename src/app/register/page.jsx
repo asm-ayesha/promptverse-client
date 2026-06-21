@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { signIn, signUp } from "@/lib/auth-client";
+import { authHref, safeCallbackUrl } from "@/lib/navigation";
 import GoogleIcon from "@/components/ui/GoogleIcon";
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
+  const params = useSearchParams();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -16,6 +18,8 @@ export default function RegisterPage() {
     password: "",
   });
   const [loading, setLoading] = useState(false);
+
+  const callbackUrl = safeCallbackUrl(params.get("callbackUrl"));
 
   const update = (key) => (e) =>
     setForm((prev) => ({ ...prev, [key]: e.target.value }));
@@ -40,11 +44,11 @@ export default function RegisterPage() {
       return;
     }
     toast.success("Account created! Welcome to PromptVerse.");
-    router.push("/dashboard");
+    router.push(callbackUrl);
   };
 
   const handleGoogle = async () => {
-    await signIn.social({ provider: "google", callbackURL: "/dashboard" });
+    await signIn.social({ provider: "google", callbackURL: callbackUrl });
   };
 
   return (
@@ -117,12 +121,23 @@ export default function RegisterPage() {
 
         <p className="mt-6 text-center text-sm text-muted">
           Already have an account?{" "}
-          <Link href="/login" className="font-medium text-accent hover:underline">
+          <Link
+            href={authHref(params.get("callbackUrl"), "/login")}
+            className="font-medium text-accent hover:underline"
+          >
             Sign In
           </Link>
         </p>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterForm />
+    </Suspense>
   );
 }
 

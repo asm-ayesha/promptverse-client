@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Bars, Xmark, ArrowRightFromSquare } from "@gravity-ui/icons";
 
 import { ThemeToggle } from "./ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { signOut } from "@/lib/auth-client";
+import { authHref } from "@/lib/navigation";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -18,6 +19,8 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+  const signInHref = authHref(pathname);
 
   const handleLogout = async () => {
     await signOut();
@@ -88,7 +91,7 @@ const Navbar = () => {
           ) : (
             <>
               <Link
-                href="/login"
+                href={signInHref}
                 className="text-sm font-medium text-muted hover:text-accent"
               >
                 Sign In
@@ -150,7 +153,7 @@ const Navbar = () => {
             ) : (
               <>
                 <Link
-                  href="/login"
+                  href={signInHref}
                   onClick={() => setIsOpen(false)}
                   className="py-3 text-foreground hover:text-accent"
                 >

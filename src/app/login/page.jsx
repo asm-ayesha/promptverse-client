@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { signIn } from "@/lib/auth-client";
+import { authHref, safeCallbackUrl } from "@/lib/navigation";
 import GoogleIcon from "@/components/ui/GoogleIcon";
 
 function LoginForm() {
@@ -14,6 +15,8 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+
+  const callbackUrl = safeCallbackUrl(params.get("callbackUrl"));
 
   // Prefill from /login?email=...&password=... (demo users page).
   useEffect(() => {
@@ -33,12 +36,12 @@ function LoginForm() {
       return;
     }
     toast.success("Welcome back!");
-    router.push("/dashboard");
+    router.push(callbackUrl);
   };
 
   const handleGoogle = async () => {
     setGoogleLoading(true);
-    await signIn.social({ provider: "google", callbackURL: "/dashboard" });
+    await signIn.social({ provider: "google", callbackURL: callbackUrl });
   };
 
   return (
@@ -107,7 +110,10 @@ function LoginForm() {
 
         <p className="mt-6 text-center text-sm text-muted">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="font-medium text-accent hover:underline">
+          <Link
+            href={authHref(params.get("callbackUrl"), "/register")}
+            className="font-medium text-accent hover:underline"
+          >
             Register
           </Link>
         </p>
