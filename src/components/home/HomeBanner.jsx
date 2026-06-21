@@ -1,23 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Magnifier, ArrowRight } from "@gravity-ui/icons";
+import { Magnifier, ArrowRight, Sparkles, Rocket } from "@gravity-ui/icons";
 import { fadeInUp, staggerContainer } from "@/lib/motion";
 
-const trendingTags = [
+// Pool of tags — a random subset is shown on each visit.
+const TAG_POOL = [
   "ChatGPT",
   "Midjourney",
   "Marketing",
   "Coding",
   "SEO Writing",
   "Productivity",
+  "Automation",
+  "Claude",
+  "Gemini",
+  "Image Generation",
+  "Business",
+  "Education",
+  "Copywriting",
+  "Data Analysis",
 ];
+
+function pickRandomTags(count = 6) {
+  const shuffled = [...TAG_POOL].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+}
 
 export default function HomeBanner() {
   const router = useRouter();
   const [query, setQuery] = useState("");
+  // Start with a stable subset for SSR, then randomize after mount to avoid
+  // a hydration mismatch.
+  const [tags, setTags] = useState(() => TAG_POOL.slice(0, 6));
+
+  useEffect(() => {
+    setTags(pickRandomTags(6));
+  }, []);
 
   const search = (e) => {
     e.preventDefault();
@@ -27,7 +48,22 @@ export default function HomeBanner() {
 
   return (
     <section className="relative overflow-hidden bg-grid">
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-accent-soft/40 via-background to-background" />
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-linear-to-b from-accent-soft/40 via-background to-background" />
+
+      {/* Floating glow accents */}
+      <motion.div
+        aria-hidden
+        animate={{ y: [0, -20, 0], opacity: [0.5, 0.8, 0.5] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        className="pointer-events-none absolute -left-20 top-10 -z-10 h-64 w-64 rounded-full bg-indigo-500/20 blur-3xl"
+      />
+      <motion.div
+        aria-hidden
+        animate={{ y: [0, 24, 0], opacity: [0.4, 0.7, 0.4] }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        className="pointer-events-none absolute -right-20 top-24 -z-10 h-72 w-72 rounded-full bg-cyan-500/20 blur-3xl"
+      />
+
       <motion.div
         variants={staggerContainer}
         initial="hidden"
@@ -38,8 +74,8 @@ export default function HomeBanner() {
           variants={fadeInUp}
           className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-1.5 text-xs font-medium text-muted"
         >
-          <span className="h-2 w-2 rounded-full bg-emerald-500" />
-          The marketplace for expert AI prompts
+          <Sparkles width={14} height={14} className="text-accent" />
+          AI prompts for productivity, automation & creativity
         </motion.span>
 
         <motion.h1
@@ -58,6 +94,7 @@ export default function HomeBanner() {
           Claude and more. Copy, customize and create faster.
         </motion.p>
 
+        {/* Search Bar */}
         <motion.form
           variants={fadeInUp}
           onSubmit={search}
@@ -72,28 +109,57 @@ export default function HomeBanner() {
           />
           <button
             type="submit"
-            className="flex items-center gap-1.5 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground transition hover:bg-accent-hover"
+            className="flex items-center gap-1.5 rounded-full bg-surface-secondary px-4 py-2.5 text-sm font-medium text-foreground transition hover:bg-surface-hover"
           >
-            Search <ArrowRight width={16} height={16} />
+            <Magnifier width={16} height={16} />
+            <span className="hidden sm:inline">Search</span>
           </button>
         </motion.form>
 
+        {/* Trending Tags (random) */}
         <motion.div
           variants={fadeInUp}
           className="mt-6 flex flex-wrap items-center justify-center gap-2"
         >
           <span className="text-xs text-muted">Trending:</span>
-          {trendingTags.map((tag) => (
-            <button
+          {tags.map((tag) => (
+            <motion.button
               key={tag}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() =>
                 router.push(`/all-prompts?search=${encodeURIComponent(tag)}`)
               }
               className="rounded-full border border-border bg-surface px-3 py-1 text-xs text-muted transition hover:border-accent hover:text-accent"
             >
               {tag}
-            </button>
+            </motion.button>
           ))}
+        </motion.div>
+
+        {/* Call-To-Action Buttons */}
+        <motion.div
+          variants={fadeInUp}
+          className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row"
+        >
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.96 }}
+            onClick={() => router.push("/all-prompts")}
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-7 py-3 text-sm font-semibold text-accent-foreground shadow-lg shadow-accent/20 transition hover:bg-accent-hover sm:w-auto"
+          >
+            Explore Prompts
+            <ArrowRight width={18} height={18} />
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.96 }}
+            onClick={() => router.push("/register")}
+            className="flex w-full items-center justify-center gap-2 rounded-full border border-border bg-surface px-7 py-3 text-sm font-semibold text-foreground transition hover:border-accent hover:text-accent sm:w-auto"
+          >
+            <Rocket width={18} height={18} />
+            Become a Creator
+          </motion.button>
         </motion.div>
       </motion.div>
     </section>
