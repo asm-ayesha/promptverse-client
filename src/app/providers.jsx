@@ -6,6 +6,7 @@ import {
   useEffect,
   useSyncExternalStore,
 } from "react";
+import { ToastContainer } from "react-toastify";
 
 export const THEME_STORAGE_KEY = "promptverse-theme";
 const THEMES = new Set(["light", "dark"]);
@@ -97,6 +98,12 @@ export function Providers({ children }) {
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
       {children}
+      <ToastContainer
+        position="bottom-right"
+        autoClose={2500}
+        theme={theme}
+        newestOnTop
+      />
     </ThemeContext.Provider>
   );
 }

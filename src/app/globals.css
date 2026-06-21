@@ -1,4 +1,38 @@
 @import "tailwindcss";
 @import "@heroui/styles";
+@import "react-toastify/dist/ReactToastify.css";
 
+/* Smooth, subtle theme transition on color-related properties only. */
+html {
+  color-scheme: light dark;
+}
+html,
+html *:where(:not(path):not(svg)) {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0.25s;
+  transition-timing-function: ease;
+}
 
+@media (prefers-reduced-motion: reduce) {
+  html,
+  html * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Subtle grid background helper for hero/section backdrops. */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--border) 60%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--border) 60%, transparent) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Reusable brand gradient text. */
+.brand-gradient {
+  background-image: linear-gradient(to top right, var(--color-indigo-600, #4f46e5), var(--color-blue-500, #3b82f6), var(--color-cyan-400, #22d3ee));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
