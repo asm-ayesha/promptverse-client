@@ -33,13 +33,13 @@ export default function CustomerReviews() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiGet("/api/home/reviews")
+    apiGet("/api/home/reviews?limit=6")
       .then((data) => setReviews(Array.isArray(data) && data.length ? data : fallbackReviews))
       .catch(() => setReviews(fallbackReviews))
       .finally(() => setLoading(false));
   }, []);
 
-  const list = loading ? [] : reviews.slice(0, 6);
+  const list = reviews.slice(0, 6);
 
   return (
     <section className="border-y border-border bg-surface/40">
@@ -50,39 +50,61 @@ export default function CustomerReviews() {
           subtitle="Real feedback from creators and power users."
         />
 
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={viewportOnce}
-          className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
-        >
-          {list.map((r) => (
-            <motion.div
-              key={r._id}
-              variants={fadeInUp}
-              className="flex h-full flex-col rounded-2xl border border-border bg-surface p-6"
-            >
-              <RatingStars value={r.rating || 5} size={16} />
-              <p className="mt-4 flex-1 text-sm leading-7 text-foreground">
-                “{r.comment}”
-              </p>
-              <div className="mt-5 flex items-center gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground">
-                  {(r.name || "U").charAt(0).toUpperCase()}
-                </span>
-                <div>
-                  <p className="text-sm font-medium text-foreground">{r.name}</p>
-                  {r.email ? (
-                    <p className="text-xs text-muted">{r.email}</p>
-                  ) : (
-                    <p className="text-xs text-muted">Verified user</p>
-                  )}
-                </div>
+        {loading ? (
+          <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex h-40 animate-pulse flex-col rounded-2xl border border-border bg-surface p-6"
+              >
+                <span className="h-4 w-24 rounded bg-surface-hover" />
+                <span className="mt-4 h-3 w-full rounded bg-surface-hover" />
+                <span className="mt-2 h-3 w-3/4 rounded bg-surface-hover" />
               </div>
-            </motion.div>
-          ))}
-        </motion.div>
+            ))}
+          </div>
+        ) : (
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+          >
+            {list.map((r) => (
+              <motion.div
+                key={r._id}
+                variants={fadeInUp}
+                className="flex h-full flex-col rounded-2xl border border-border bg-surface p-6"
+              >
+                <RatingStars value={r.rating || 5} size={16} />
+                <p className="mt-4 flex-1 text-sm leading-7 text-foreground">
+                  “{r.comment}”
+                </p>
+                <div className="mt-5 flex items-center gap-3">
+                  {r.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={r.image}
+                      alt={r.name}
+                      className="h-9 w-9 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground">
+                      {(r.name || "U").charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{r.name}</p>
+                    <p className="text-xs text-muted">
+                      {r.email || "Verified user"}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
       </div>
     </section>
   );

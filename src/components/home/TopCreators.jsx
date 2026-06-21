@@ -108,8 +108,6 @@ export default function TopCreators() {
 
   if (!loading && creators.length === 0) return null;
 
-  const items = loading ? Array.from({ length: 5 }) : creators;
-
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 md:py-24 lg:px-8">
       <SectionHeading
@@ -118,22 +116,32 @@ export default function TopCreators() {
         subtitle="The most prolific prompt engineers on the platform."
       />
 
-      <motion.div
-        variants={staggerContainer}
-        initial="hidden"
-        whileInView="visible"
-        viewport={viewportOnce}
-        className="mt-12 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-5"
-      >
-        {items.map((c, i) => (
-          <CreatorCard
-            key={c?._id || i}
-            creator={c}
-            index={i}
-            loading={loading}
-          />
-        ))}
-      </motion.div>
+      {loading ? (
+        <div className="mt-12 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-5">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex animate-pulse flex-col items-center rounded-2xl border border-border bg-surface p-5"
+            >
+              <span className="h-16 w-16 rounded-full bg-surface-hover" />
+              <span className="mt-3 h-3 w-20 rounded bg-surface-hover" />
+              <span className="mt-3 h-3 w-24 rounded bg-surface-hover" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+          className="mt-12 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-5"
+        >
+          {creators.map((c, i) => (
+            <CreatorCard key={c._id || i} creator={c} index={i} loading={false} />
+          ))}
+        </motion.div>
+      )}
     </section>
   );
 }
