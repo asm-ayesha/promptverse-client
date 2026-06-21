@@ -5,6 +5,12 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
+export const metadata = {
+  title: "PromptVerse — AI Prompt Marketplace",
+  description:
+    "Discover, share and sell high-quality AI prompts for ChatGPT, Midjourney, Claude and more.",
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
