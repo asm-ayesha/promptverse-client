@@ -4,6 +4,7 @@ import { themeInitScript } from "./theme-script";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AuthTokenSync from "@/components/AuthTokenSync";
 
 export const metadata = {
   title: "PromptVerse — AI Prompt Marketplace",
@@ -19,6 +20,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className="bg-background text-foreground">
         <Providers>
+          <AuthTokenSync />
           <Navbar></Navbar>
           <main className="min-h-screen">
             {children}

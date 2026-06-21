@@ -23,7 +23,7 @@ const fallbackReviews = [
   {
     _id: "f3",
     name: "Priya Nair",
-    comment: "Premium was worth every cent — the private prompts are next level.",
+    comment: "Premium was worth every cent - the private prompts are next level.",
     rating: 4,
   },
 ];

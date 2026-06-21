@@ -21,6 +21,21 @@ html *:where(:not(path):not(svg)) {
   }
 }
 
+/* Interactive elements show a pointer cursor (UA defaults <button> to an arrow
+   in modern resets). Disabled controls fall back to not-allowed. Tailwind
+   `cursor-*` utilities still override these because class selectors win. */
+button:not(:disabled),
+[role="button"],
+label[for],
+summary,
+select {
+  cursor: pointer;
+}
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 /* Subtle grid background helper for hero/section backdrops. */
 .bg-grid {
   background-image:

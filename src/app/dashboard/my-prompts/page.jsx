@@ -3,11 +3,13 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { toast } from "react-toastify";
-import { Pencil, TrashBin, Plus } from "@gravity-ui/icons";
+import { Pencil, TrashBin, Plus, ChartColumn } from "@gravity-ui/icons";
 import { apiGet, apiDelete } from "@/lib/api";
 import PageHeader from "@/components/dashboard/PageHeader";
 import PromptForm from "@/components/dashboard/PromptForm";
+import PromptAnalyticsModal from "@/components/dashboard/PromptAnalyticsModal";
 import Modal from "@/components/ui/Modal";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import EmptyState from "@/components/ui/EmptyState";
 
@@ -21,6 +23,9 @@ export default function MyPromptsPage() {
   const [prompts, setPrompts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
+  const [analytics, setAnalytics] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -34,14 +39,18 @@ export default function MyPromptsPage() {
     load();
   }, [load]);
 
-  const handleDelete = async (id) => {
-    if (!confirm("Delete this prompt? This cannot be undone.")) return;
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
     try {
-      await apiDelete(`/api/prompts/${id}`);
+      await apiDelete(`/api/prompts/${deleteTarget._id}`);
       toast.success("Prompt deleted");
-      setPrompts((prev) => prev.filter((p) => p._id !== id));
+      setPrompts((prev) => prev.filter((p) => p._id !== deleteTarget._id));
+      setDeleteTarget(null);
     } catch (err) {
       toast.error(err.message || "Could not delete");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -70,7 +79,7 @@ export default function MyPromptsPage() {
       ) : (
         <div className="overflow-hidden rounded-2xl border border-border bg-surface">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full min-w-[680px] text-left text-sm">
               <thead className="border-b border-border text-muted">
                 <tr>
                   <th className="px-5 py-3 font-medium">Title</th>
@@ -78,7 +87,7 @@ export default function MyPromptsPage() {
                   <th className="px-5 py-3 font-medium">Visibility</th>
                   <th className="px-5 py-3 font-medium">Status</th>
                   <th className="px-5 py-3 font-medium">Copies</th>
-                  <th className="px-5 py-3 text-right font-medium">Actions</th>
+                  <th className="px-5 py-3 text-center font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -109,14 +118,23 @@ export default function MyPromptsPage() {
                     <td className="px-5 py-3">
                       <div className="flex items-center justify-end gap-2">
                         <button
+                          onClick={() => setAnalytics(p)}
+                          aria-label="Analytics"
+                          title="Analytics"
+                          className="rounded-md p-1.5 text-muted transition hover:bg-surface-hover hover:text-accent"
+                        >
+                          <ChartColumn width={16} height={16} />
+                        </button>
+                        <button
                           onClick={() => setEditing(p)}
                           aria-label="Edit"
+                          title="Edit"
                           className="rounded-md p-1.5 text-muted transition hover:bg-surface-hover hover:text-accent"
                         >
                           <Pencil width={16} height={16} />
                         </button>
                         <button
-                          onClick={() => handleDelete(p._id)}
+                          onClick={() => setDeleteTarget(p)}
                           aria-label="Delete"
                           className="rounded-md p-1.5 text-muted transition hover:bg-surface-hover hover:text-danger"
                         >
@@ -132,9 +150,10 @@ export default function MyPromptsPage() {
         </div>
       )}
 
-      <Modal open={!!editing} onClose={() => setEditing(null)} title="Edit Prompt">
-        <div className="max-h-[70vh] overflow-y-auto">
+      <Modal open={!!editing} onClose={() => setEditing(null)} title="Edit Prompt" size="xl">
+        <div className="max-h-[70vh] overflow-y-auto pr-1">
           <PromptForm
+            embedded
             initial={editing}
             onSuccess={() => {
               setEditing(null);
@@ -143,6 +162,23 @@ export default function MyPromptsPage() {
           />
         </div>
       </Modal>
+
+      <PromptAnalyticsModal
+        open={!!analytics}
+        prompt={analytics}
+        prompts={prompts}
+        onClose={() => setAnalytics(null)}
+      />
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDelete}
+        loading={deleting}
+        title="Delete prompt"
+        message={`Delete "${deleteTarget?.title}"? This cannot be undone.`}
+        confirmLabel="Delete"
+      />
     </div>
   );
 }

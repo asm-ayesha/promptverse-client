@@ -24,6 +24,13 @@ import EmptyState from "@/components/ui/EmptyState";
 const ACCENT = "#6366f1";
 const CYAN = "#06b6d4";
 
+const formatDate = (value) => {
+  const d = new Date(value);
+  return Number.isNaN(d.getTime())
+    ? value
+    : d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+};
+
 export default function CreatorAnalyticsPage() {
   const { role } = useAuth();
   const [data, setData] = useState(null);
@@ -68,7 +75,7 @@ export default function CreatorAnalyticsPage() {
         <StatCard label="Total Bookmarks" value={data.totalBookmarks} icon={Bookmark} />
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-6">
         <ChartCard title="Copies per prompt">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data.copiesByPrompt}>
@@ -81,18 +88,24 @@ export default function CreatorAnalyticsPage() {
                   border: "1px solid var(--border)",
                   borderRadius: 12,
                   color: "var(--foreground)",
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+                  padding: "10px 14px",
                 }}
+                labelStyle={{ color: "var(--foreground)", fontWeight: 700, marginBottom: 4 }}
+                itemStyle={{ color: "var(--foreground)", fontSize: 13 }}
+                cursor={{ fill: "rgba(148,163,184,0.12)" }}
+                formatter={(value) => [`${value} copies`, "Total"]}
               />
-              <Bar dataKey="copies" fill={ACCENT} radius={[6, 6, 0, 0]} />
+              <Bar dataKey="copies" name="Copies" fill={ACCENT} radius={[6, 6, 0, 0]} maxBarSize={48} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Prompt growth over time">
+        <ChartCard title="Daily copies">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data.growth}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.2)" />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94a3b8" }} />
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#94a3b8" }} />
               <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} allowDecimals={false} />
               <Tooltip
                 contentStyle={{
@@ -100,9 +113,24 @@ export default function CreatorAnalyticsPage() {
                   border: "1px solid var(--border)",
                   borderRadius: 12,
                   color: "var(--foreground)",
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+                  padding: "10px 14px",
                 }}
+                labelStyle={{ color: "var(--foreground)", fontWeight: 700, marginBottom: 4 }}
+                itemStyle={{ color: "var(--foreground)", fontSize: 13 }}
+                cursor={{ stroke: "rgba(148,163,184,0.4)", strokeWidth: 1 }}
+                labelFormatter={formatDate}
+                formatter={(value) => [`${value} copies`, "Total"]}
               />
-              <Line type="monotone" dataKey="count" stroke={CYAN} strokeWidth={3} dot={{ r: 4 }} />
+              <Line
+                type="monotone"
+                dataKey="count"
+                name="Copies"
+                stroke={CYAN}
+                strokeWidth={3}
+                dot={{ r: 4 }}
+                activeDot={{ r: 6 }}
+              />
             </LineChart>
           </ResponsiveContainer>
         </ChartCard>

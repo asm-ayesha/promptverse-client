@@ -74,9 +74,9 @@ const Navbar = () => {
             <li>
               <Link
                 href="/dashboard"
-                aria-current={isActive("/dashboard") ? "page" : undefined}
+                aria-current={isActive("/dashboard", ["/payment"]) ? "page" : undefined}
                 className={`text-sm font-medium transition-colors ${
-                  isActive("/dashboard")
+                  isActive("/dashboard", ["/payment"])
                     ? "text-accent"
                     : "text-muted hover:text-accent"
                 }`}
@@ -174,9 +174,9 @@ const Navbar = () => {
                 <Link
                   href="/dashboard"
                   onClick={() => setIsOpen(false)}
-                  aria-current={isActive("/dashboard") ? "page" : undefined}
+                  aria-current={isActive("/dashboard", ["/payment"]) ? "page" : undefined}
                   className={`py-3 ${
-                    isActive("/dashboard")
+                    isActive("/dashboard", ["/payment"])
                       ? "font-semibold text-accent"
                       : "text-foreground hover:text-accent"
                   }`}

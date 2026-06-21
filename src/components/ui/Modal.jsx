@@ -3,8 +3,14 @@
 import { useEffect } from "react";
 import { Xmark } from "@gravity-ui/icons";
 
+const sizeClasses = {
+  md: "max-w-md",
+  lg: "max-w-lg",
+  xl: "max-w-2xl",
+};
+
 // Lightweight controlled modal (avoids HeroUI v3 overlay-state wiring).
-export default function Modal({ open, onClose, title, children }) {
+export default function Modal({ open, onClose, title, children, size = "md" }) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e) => e.key === "Escape" && onClose?.();
@@ -24,7 +30,11 @@ export default function Modal({ open, onClose, title, children }) {
         className="absolute inset-0 bg-backdrop/70 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative z-10 w-full max-w-md rounded-2xl border border-border bg-surface p-6 shadow-xl">
+      <div
+        className={`relative z-10 w-full rounded-2xl border border-border bg-surface p-6 shadow-xl ${
+          sizeClasses[size] || sizeClasses.md
+        }`}
+      >
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-foreground">{title}</h3>
           <button

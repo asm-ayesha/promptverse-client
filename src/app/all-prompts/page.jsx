@@ -2,13 +2,27 @@
 
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Magnifier, ChevronLeft, ChevronRight } from "@gravity-ui/icons";
+import { motion } from "framer-motion";
+import {
+  Magnifier,
+  ChevronLeft,
+  ChevronRight,
+  Xmark,
+  SlidersVertical,
+} from "@gravity-ui/icons";
 import { apiGet } from "@/lib/api";
+import { fadeInUp, staggerContainer } from "@/lib/motion";
 import PromptCard from "@/components/PromptCard";
 import { SkeletonGrid } from "@/components/ui/SkeletonCard";
 import EmptyState from "@/components/ui/EmptyState";
 
 const PAGE_SIZE = 9;
+
+const SORT_OPTIONS = [
+  { value: "latest", label: "Latest" },
+  { value: "popular", label: "Most Popular" },
+  { value: "copied", label: "Most Copied" },
+];
 
 function AllPromptsInner() {
   const params = useSearchParams();
@@ -58,116 +72,209 @@ function AllPromptsInner() {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
+  const resetAll = () => {
+    setSearch("");
+    setPage(1);
+    setFilters({ category: "", aiTool: "", difficulty: "", sort: "latest" });
+  };
+
+  // Active filters (excluding sort) for removable chips.
+  const activeChips = [
+    filters.category && { key: "category", value: filters.category },
+    filters.aiTool && { key: "aiTool", value: filters.aiTool },
+    filters.difficulty && { key: "difficulty", value: filters.difficulty },
+  ].filter(Boolean);
+
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 lg:px-8">
-      <div className="mb-2">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-          All Prompts
-        </h1>
-        <p className="mt-2 text-sm text-muted">
-          Browse the full PromptVerse marketplace.
-        </p>
-      </div>
+    <div>
+      {/* Hero header */}
+      <section className="relative overflow-hidden border-b border-border bg-grid">
+        <div className="pointer-events-none absolute -left-24 top-0 h-72 w-72 rounded-full bg-accent/20 blur-3xl" />
+        <div className="pointer-events-none absolute -right-24 bottom-0 h-72 w-72 rounded-full bg-sky-500/10 blur-3xl" />
 
-      {/* Search + sort bar */}
-      <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-center">
-        <div className="flex flex-1 items-center gap-2 rounded-full border border-border bg-surface px-4 py-2">
-          <Magnifier width={18} height={18} className="text-muted" />
-          <input
-            value={search}
-            onChange={(e) => {
-              setPage(1);
-              setSearch(e.target.value);
-            }}
-            placeholder="Search prompts..."
-            className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted"
-          />
-        </div>
-        <select
-          value={filters.sort}
-          onChange={(e) => updateFilter("sort", e.target.value)}
-          className="rounded-full border border-border bg-surface px-4 py-2 text-sm text-foreground outline-none"
-        >
-          <option value="latest">Latest</option>
-          <option value="popular">Most Popular</option>
-          <option value="copied">Most Copied</option>
-        </select>
-      </div>
+        <div className="relative mx-auto max-w-7xl px-4 py-14 lg:px-8">
+          <span className="inline-block rounded-full border border-border bg-surface/70 px-3 py-1 text-xs font-medium uppercase tracking-widest text-muted backdrop-blur">
+            Marketplace
+          </span>
+          <h1 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl">
+            Explore <span className="brand-gradient">Prompts</span>
+          </h1>
+          <p className="mt-3 max-w-xl text-sm leading-7 text-muted md:text-base">
+            Discover expert-crafted prompts across writing, code, design and more.
+            Search, filter, and copy in one click.
+          </p>
 
-      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[240px_1fr]">
-        {/* Filters */}
-        <aside className="h-fit space-y-6 rounded-2xl border border-border bg-surface p-5">
-          <FilterGroup
-            label="Category"
-            value={filters.category}
-            options={meta.categories}
-            onChange={(v) => updateFilter("category", v)}
-          />
-          <FilterGroup
-            label="AI Tool"
-            value={filters.aiTool}
-            options={meta.aiTools}
-            onChange={(v) => updateFilter("aiTool", v)}
-          />
-          <FilterGroup
-            label="Difficulty"
-            value={filters.difficulty}
-            options={meta.difficulties}
-            onChange={(v) => updateFilter("difficulty", v)}
-          />
-          <button
-            onClick={() => {
-              setSearch("");
-              setPage(1);
-              setFilters({ category: "", aiTool: "", difficulty: "", sort: "latest" });
-            }}
-            className="w-full rounded-full border border-border py-2 text-sm text-muted transition hover:text-accent"
-          >
-            Clear Filters
-          </button>
-        </aside>
-
-        {/* Results */}
-        <div>
-          {loading ? (
-            <SkeletonGrid count={6} />
-          ) : data.prompts.length === 0 ? (
-            <EmptyState
-              title="No prompts found"
-              description="Try adjusting your search or filters."
+          <div className="mt-7 flex max-w-2xl items-center gap-2 rounded-2xl border border-border bg-surface/80 px-4 py-3 shadow-sm backdrop-blur focus-within:border-focus focus-within:ring-2 focus-within:ring-focus/30">
+            <Magnifier width={20} height={20} className="shrink-0 text-muted" />
+            <input
+              value={search}
+              onChange={(e) => {
+                setPage(1);
+                setSearch(e.target.value);
+              }}
+              placeholder="Search prompts, tools, tags..."
+              className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted"
             />
-          ) : (
-            <>
-              <p className="mb-4 text-sm text-muted">{data.total} prompts found</p>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                {data.prompts.map((p) => (
-                  <PromptCard key={p._id} prompt={p} />
-                ))}
+            {search ? (
+              <button
+                onClick={() => {
+                  setPage(1);
+                  setSearch("");
+                }}
+                aria-label="Clear search"
+                className="rounded-full p-1 text-muted transition hover:bg-surface-hover hover:text-foreground"
+              >
+                <Xmark width={16} height={16} />
+              </button>
+            ) : null}
+          </div>
+        </div>
+      </section>
+
+      <div className="mx-auto max-w-7xl px-4 py-10 lg:px-8">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[260px_1fr]">
+          {/* Filters */}
+          <aside className="h-fit lg:sticky lg:top-20">
+            <div className="space-y-6 rounded-2xl border border-border bg-surface p-5">
+              <div className="flex items-center justify-between">
+                <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <SlidersVertical width={16} height={16} className="text-accent" />
+                  Filters
+                </h2>
+                {activeChips.length > 0 ? (
+                  <button
+                    onClick={resetAll}
+                    className="text-xs font-medium text-accent hover:underline"
+                  >
+                    Reset
+                  </button>
+                ) : null}
               </div>
 
-              {data.totalPages > 1 ? (
-                <div className="mt-10 flex items-center justify-center gap-2">
-                  <button
-                    disabled={page <= 1}
-                    onClick={() => setPage((p) => p - 1)}
-                    className="flex items-center gap-1 rounded-full border border-border px-3 py-2 text-sm text-foreground transition hover:bg-surface-hover disabled:opacity-40"
-                  >
-                    <ChevronLeft width={16} height={16} /> Prev
-                  </button>
-                  <span className="px-4 text-sm text-muted">
-                    Page {page} of {data.totalPages}
-                  </span>
-                  <button
-                    disabled={page >= data.totalPages}
-                    onClick={() => setPage((p) => p + 1)}
-                    className="flex items-center gap-1 rounded-full border border-border px-3 py-2 text-sm text-foreground transition hover:bg-surface-hover disabled:opacity-40"
-                  >
-                    Next <ChevronRight width={16} height={16} />
-                  </button>
+              <FilterGroup
+                label="Category"
+                value={filters.category}
+                options={meta.categories}
+                onChange={(v) => updateFilter("category", v)}
+              />
+              <FilterGroup
+                label="AI Tool"
+                value={filters.aiTool}
+                options={meta.aiTools}
+                onChange={(v) => updateFilter("aiTool", v)}
+              />
+              <FilterGroup
+                label="Difficulty"
+                value={filters.difficulty}
+                options={meta.difficulties}
+                onChange={(v) => updateFilter("difficulty", v)}
+              />
+            </div>
+          </aside>
+
+          {/* Results */}
+          <div>
+            {/* Toolbar */}
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-muted">
+                {loading ? (
+                  "Loading prompts..."
+                ) : (
+                  <>
+                    <span className="font-semibold text-foreground">
+                      {data.total}
+                    </span>{" "}
+                    {data.total === 1 ? "prompt" : "prompts"} found
+                  </>
+                )}
+              </p>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted">Sort by</span>
+                <div className="inline-flex rounded-full border border-border bg-surface p-1">
+                  {SORT_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      onClick={() => updateFilter("sort", opt.value)}
+                      className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                        filters.sort === opt.value
+                          ? "bg-accent text-accent-foreground"
+                          : "text-muted hover:text-foreground"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
                 </div>
-              ) : null}
-            </>
-          )}
+              </div>
+            </div>
+
+            {/* Active filter chips */}
+            {activeChips.length > 0 ? (
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                {activeChips.map((chip) => (
+                  <button
+                    key={chip.key}
+                    onClick={() => updateFilter(chip.key, "")}
+                    className="group flex items-center gap-1.5 rounded-full bg-accent-soft px-3 py-1 text-xs font-medium text-accent-soft-foreground transition hover:bg-accent hover:text-accent-foreground"
+                  >
+                    {chip.value}
+                    <Xmark width={12} height={12} />
+                  </button>
+                ))}
+              </div>
+            ) : null}
+
+            <div className="mt-6">
+              {loading && data.prompts.length === 0 ? (
+                <SkeletonGrid count={6} />
+              ) : !loading && data.prompts.length === 0 ? (
+                <EmptyState
+                  title="No prompts found"
+                  description="Try adjusting your search or filters."
+                />
+              ) : (
+                <>
+                  <motion.div
+                    variants={staggerContainer}
+                    initial="hidden"
+                    animate="visible"
+                    className={`grid grid-cols-1 gap-6 transition-opacity duration-200 sm:grid-cols-2 xl:grid-cols-3 ${
+                      loading ? "pointer-events-none opacity-50" : "opacity-100"
+                    }`}
+                  >
+                    {data.prompts.map((p) => (
+                      <motion.div key={p._id} variants={fadeInUp}>
+                        <PromptCard prompt={p} />
+                      </motion.div>
+                    ))}
+                  </motion.div>
+
+                  {data.totalPages > 1 ? (
+                    <div className="mt-10 flex items-center justify-center gap-2">
+                      <button
+                        disabled={page <= 1}
+                        onClick={() => setPage((p) => p - 1)}
+                        className="flex items-center gap-1 rounded-full border border-border px-3 py-2 text-sm text-foreground transition hover:bg-surface-hover disabled:opacity-40"
+                      >
+                        <ChevronLeft width={16} height={16} /> Prev
+                      </button>
+                      <span className="px-4 text-sm text-muted">
+                        Page {page} of {data.totalPages}
+                      </span>
+                      <button
+                        disabled={page >= data.totalPages}
+                        onClick={() => setPage((p) => p + 1)}
+                        className="flex items-center gap-1 rounded-full border border-border px-3 py-2 text-sm text-foreground transition hover:bg-surface-hover disabled:opacity-40"
+                      >
+                        Next <ChevronRight width={16} height={16} />
+                      </button>
+                    </div>
+                  ) : null}
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -177,11 +284,13 @@ function AllPromptsInner() {
 function FilterGroup({ label, value, options, onChange }) {
   return (
     <div>
-      <h3 className="mb-2 text-sm font-semibold text-foreground">{label}</h3>
+      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted">
+        {label}
+      </h3>
       <div className="flex flex-wrap gap-2 lg:flex-col lg:flex-nowrap">
         <button
           onClick={() => onChange("")}
-          className={`rounded-full px-3 py-1 text-left text-sm transition lg:rounded-lg ${
+          className={`rounded-full px-3 py-1.5 text-left text-sm transition lg:rounded-lg ${
             value === ""
               ? "bg-accent text-accent-foreground"
               : "text-muted hover:bg-surface-hover"
@@ -193,7 +302,7 @@ function FilterGroup({ label, value, options, onChange }) {
           <button
             key={opt}
             onClick={() => onChange(opt)}
-            className={`rounded-full px-3 py-1 text-left text-sm transition lg:rounded-lg ${
+            className={`rounded-full px-3 py-1.5 text-left text-sm transition lg:rounded-lg ${
               value === opt
                 ? "bg-accent text-accent-foreground"
                 : "text-muted hover:bg-surface-hover"

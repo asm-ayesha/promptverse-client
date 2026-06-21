@@ -37,10 +37,10 @@ const itemsByRole = {
   ],
   admin: [
     { href: "/dashboard/admin/analytics", label: "Analytics", icon: ChartColumn },
-    { href: "/dashboard/admin/users", label: "Users", icon: Persons },
-    { href: "/dashboard/admin/prompts", label: "Prompts", icon: ShieldCheck },
-    { href: "/dashboard/admin/payments", label: "Payments", icon: Receipt },
-    { href: "/dashboard/admin/reports", label: "Reports", icon: Flag },
+    { href: "/dashboard/admin/users", label: "All Users", icon: Persons },
+    { href: "/dashboard/admin/prompts", label: "All Prompts", icon: ShieldCheck },
+    { href: "/dashboard/admin/payments", label: "All Payments", icon: Receipt },
+    { href: "/dashboard/admin/reports", label: "Reported Prompts", icon: Flag },
   ],
   profile: [{ href: "/dashboard/profile", label: "Profile", icon: Person }],
 };
@@ -50,53 +50,73 @@ export default function DashboardSidebar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  const links = [
-    ...itemsByRole.common,
-    ...(itemsByRole[role] || itemsByRole.user),
-    ...itemsByRole.profile,
+  // Admins use Analytics as their main page (no separate Overview).
+  const workspaceItems =
+    role === "admin"
+      ? itemsByRole.admin
+      : [...itemsByRole.common, ...(itemsByRole[role] || itemsByRole.user)];
+
+  const sections = [
+    { title: "Workspace", items: workspaceItems },
+    { title: "Account", items: itemsByRole.profile },
   ];
 
   const NavList = () => (
-    <nav className="space-y-1">
-      {links.map((item) => {
-        const Icon = item.icon;
-        const active = pathname === item.href;
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={() => setOpen(false)}
-            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-              active
-                ? "bg-accent text-accent-foreground"
-                : "text-muted hover:bg-surface-hover hover:text-foreground"
-            }`}
-          >
-            <Icon width={18} height={18} />
-            {item.label}
-          </Link>
-        );
-      })}
+    <nav className="space-y-5">
+      {sections.map((section) => (
+        <div key={section.title}>
+          <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted/70">
+            {section.title}
+          </p>
+          <div className="space-y-1">
+            {section.items.map((item) => {
+              const Icon = item.icon;
+              const active = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+                    active
+                      ? "bg-accent text-accent-foreground shadow-sm shadow-accent/20"
+                      : "text-muted hover:bg-surface-hover hover:text-foreground"
+                  }`}
+                >
+                  <Icon
+                    width={18}
+                    height={18}
+                    className={active ? "" : "text-muted group-hover:text-foreground"}
+                  />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      ))}
     </nav>
   );
 
   const Profile = () => (
-    <div className="mb-6 flex items-center gap-3 rounded-xl border border-border bg-background p-3">
+    <div className="mb-6 flex items-center gap-3 rounded-2xl border border-border bg-linear-to-br from-surface to-background p-3">
       {user?.image ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={user.image}
           alt={user.name}
-          className="h-10 w-10 rounded-full object-cover"
+          className="h-11 w-11 rounded-full object-cover ring-2 ring-accent/30"
         />
       ) : (
-        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground">
+        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground ring-2 ring-accent/30">
           {(user?.name || "U").charAt(0).toUpperCase()}
         </span>
       )}
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium text-foreground">{user?.name}</p>
-        <span className="text-xs capitalize text-accent">{role}</span>
+        <p className="truncate text-sm font-semibold text-foreground">{user?.name}</p>
+        <span className="inline-block rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-medium capitalize text-accent-soft-foreground">
+          {role}
+        </span>
       </div>
     </div>
   );
@@ -112,7 +132,7 @@ export default function DashboardSidebar() {
       </button>
 
       {/* Desktop sidebar */}
-      <aside className="hidden h-fit w-64 shrink-0 rounded-2xl border border-border bg-surface p-4 lg:block">
+      <aside className="sticky top-24 hidden h-fit w-64 shrink-0 self-start rounded-2xl border border-border bg-surface p-4 lg:block">
         <Profile />
         <NavList />
       </aside>

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { apiGet } from "@/lib/api";
-import { fadeInUp, staggerContainer, viewportOnce } from "@/lib/motion";
+import { fadeInUp } from "@/lib/motion";
 import SectionHeading from "@/components/ui/SectionHeading";
 import PromptCard from "@/components/PromptCard";
 import { SkeletonGrid } from "@/components/ui/SkeletonCard";
@@ -37,19 +37,20 @@ export default function FeaturedPrompts() {
           No prompts available yet. Check back soon.
         </p>
       ) : (
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={viewportOnce}
-          className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          {prompts.map((prompt) => (
-            <motion.div key={prompt._id} variants={fadeInUp}>
+        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {prompts.map((prompt, i) => (
+            <motion.div
+              key={prompt._id}
+              variants={fadeInUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ delay: (i % 3) * 0.08 }}
+            >
               <PromptCard prompt={prompt} />
             </motion.div>
           ))}
-        </motion.div>
+        </div>
       )}
 
       <div className="mt-10 text-center">
