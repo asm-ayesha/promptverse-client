@@ -45,9 +45,9 @@ export default function HowItWorks() {
             <motion.div
               key={step.title}
               variants={fadeInUp}
-              className="relative flex h-full flex-col rounded-2xl border border-border bg-surface p-8"
+              className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface p-8"
             >
-              <span className="absolute right-6 top-6 text-4xl font-bold text-accent-soft">
+              <span className="brand-gradient pointer-events-none absolute right-5 top-3 text-6xl font-extrabold leading-none tracking-tight opacity-90 select-none">
                 0{i + 1}
               </span>
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent text-accent-foreground">
