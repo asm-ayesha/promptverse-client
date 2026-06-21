@@ -52,7 +52,8 @@ export default function AdminPromptsPage() {
     try {
       await apiPatch(`/api/admin/prompts/${p._id}/feature`);
       setLocal(p._id, { featured: !p.featured });
-      toast.success(p.featured ? "Removed from featured" : "Marked as featured");
+      if (p.featured) toast.error("Removed from featured");
+      else toast.success("Marked as featured");
     } catch (err) {
       toast.error(err.message);
     }
@@ -77,7 +78,7 @@ export default function AdminPromptsPage() {
     try {
       await apiDelete(`/api/admin/prompts/${deleteTarget._id}`);
       setPrompts((prev) => prev.filter((x) => x._id !== deleteTarget._id));
-      toast.success("Prompt deleted");
+      toast.error("Prompt deleted");
       setDeleteTarget(null);
     } catch (err) {
       toast.error(err.message);

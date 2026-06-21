@@ -4,6 +4,7 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
+import { Eye, EyeSlash } from "@gravity-ui/icons";
 import { signIn, signUp } from "@/lib/auth-client";
 import { authHref, safeCallbackUrl } from "@/lib/navigation";
 import GoogleIcon from "@/components/ui/GoogleIcon";
@@ -141,16 +142,39 @@ export default function RegisterPage() {
   );
 }
 
-function Field({ label, ...props }) {
+function Field({ label, type, ...props }) {
+  const [showPassword, setShowPassword] = useState(false);
+  const isPassword = type === "password";
+  const inputType = isPassword && showPassword ? "text" : type;
+
   return (
     <div>
       <label className="mb-1.5 block text-sm font-medium text-foreground">
         {label}
       </label>
-      <input
-        {...props}
-        className="w-full rounded-xl border border-field-border bg-field px-4 py-2.5 text-sm text-field-foreground outline-none transition focus:border-focus focus:ring-2 focus:ring-focus/30"
-      />
+      <div className="relative">
+        <input
+          {...props}
+          type={inputType}
+          className={`w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground outline-none transition placeholder:text-muted hover:border-muted/60 focus:border-focus focus:ring-2 focus:ring-focus/30 ${
+            isPassword ? "pr-11" : ""
+          }`}
+        />
+        {isPassword ? (
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            className="absolute inset-y-0 right-0 flex items-center px-3 text-muted transition hover:text-foreground"
+          >
+            {showPassword ? (
+              <EyeSlash width={18} height={18} />
+            ) : (
+              <Eye width={18} height={18} />
+            )}
+          </button>
+        ) : null}
+      </div>
     </div>
   );
 }

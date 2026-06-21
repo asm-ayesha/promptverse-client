@@ -91,7 +91,8 @@ function PromptDetailsPage() {
     try {
       const res = await apiPost(`/api/bookmarks/${id}`);
       setBookmarked(res.bookmarked);
-      toast.success(res.message);
+      if (res.bookmarked) toast.success(res.message);
+      else toast.error(res.message);
     } catch (err) {
       toast.error(err.message || "Could not bookmark");
     }

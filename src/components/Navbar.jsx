@@ -102,7 +102,7 @@ const Navbar = () => {
               </Link>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-sm text-muted transition hover:text-accent"
+                className="flex items-center gap-1.5 rounded-full border border-danger/30 bg-danger-soft px-3 py-1.5 text-sm font-medium text-danger-soft-foreground transition hover:bg-danger hover:text-danger-foreground"
               >
                 <ArrowRightFromSquare width={16} height={16} />
                 Logout
@@ -185,8 +185,9 @@ const Navbar = () => {
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="mt-2 rounded-full border border-border py-2 text-sm text-foreground"
+                  className="mt-2 flex items-center justify-center gap-1.5 rounded-full border border-danger/30 bg-danger-soft py-2 text-sm font-medium text-danger-soft-foreground transition hover:bg-danger hover:text-danger-foreground"
                 >
+                  <ArrowRightFromSquare width={16} height={16} />
                   Logout
                 </button>
               </>

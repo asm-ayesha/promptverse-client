@@ -44,7 +44,7 @@ export default function MyPromptsPage() {
     setDeleting(true);
     try {
       await apiDelete(`/api/prompts/${deleteTarget._id}`);
-      toast.success("Prompt deleted");
+      toast.error("Prompt deleted");
       setPrompts((prev) => prev.filter((p) => p._id !== deleteTarget._id));
       setDeleteTarget(null);
     } catch (err) {
