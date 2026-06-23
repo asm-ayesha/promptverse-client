@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { ArrowLeft, CircleCheck, Lock, Star } from "@gravity-ui/icons";
 import { loadStripe } from "@stripe/stripe-js";
@@ -12,6 +12,7 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { apiPost } from "@/lib/api";
+import { safeCallbackUrl } from "@/lib/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
@@ -29,7 +30,7 @@ const benefits = [
 
 // The inline card form rendered inside <Elements>. Confirms the payment
 // without leaving the page (redirect: "if_required").
-function CheckoutForm() {
+function CheckoutForm({ returnUrl }) {
   const stripe = useStripe();
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
@@ -44,7 +45,7 @@ function CheckoutForm() {
       elements,
       redirect: "if_required",
       confirmParams: {
-        return_url: `${window.location.origin}/payment`,
+        return_url: `${window.location.origin}${returnUrl}`,
       },
     });
 
@@ -60,9 +61,10 @@ function CheckoutForm() {
           paymentIntentId: paymentIntent.id,
         });
         toast.success("Premium unlocked! 🎉");
-        // Full reload so the session picks up the new subscription.
+        // Full reload so the session picks up the new subscription, then
+        // return the user to where they started (e.g. the premium prompt).
         setTimeout(() => {
-          window.location.href = "/dashboard";
+          window.location.href = returnUrl;
         }, 1000);
       } catch (err) {
         toast.error(err.message || "Could not confirm payment");
@@ -91,6 +93,8 @@ function CheckoutForm() {
 
 function PaymentInner() {
   const router = useRouter();
+  const params = useSearchParams();
+  const returnUrl = safeCallbackUrl(params.get("returnUrl"));
   const { subscription } = useAuth();
   const [clientSecret, setClientSecret] = useState("");
   const [error, setError] = useState("");
@@ -209,7 +213,7 @@ function PaymentInner() {
             </div>
           ) : (
             <Elements stripe={stripePromise} options={options}>
-              <CheckoutForm />
+              <CheckoutForm returnUrl={returnUrl} />
             </Elements>
           )}
 
@@ -225,7 +229,9 @@ function PaymentInner() {
 export default function PaymentPage() {
   return (
     <ProtectedRoute>
-      <PaymentInner />
+      <Suspense fallback={null}>
+        <PaymentInner />
+      </Suspense>
     </ProtectedRoute>
   );
 }

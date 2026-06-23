@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Copy, Gem, LockOpen, Person } from "@gravity-ui/icons";
+import { Copy, Gem, LockOpen, Person, TrashBin } from "@gravity-ui/icons";
 import RatingStars from "./ui/RatingStars";
 
 const categoryColors = {
@@ -16,9 +16,12 @@ const categoryColors = {
   Design: "from-rose-400 to-red-500",
 };
 
-export default function PromptCard({ prompt }) {
+export default function PromptCard({ prompt, onRemove }) {
   const gradient = categoryColors[prompt.category] || "from-indigo-400 to-cyan-400";
   const [imgError, setImgError] = useState(false);
+  // When a remove handler is supplied (e.g. Saved Prompts), the trash button
+  // takes the top-right corner and the visibility badge moves to the left.
+  const badgeSide = onRemove ? "left-3" : "right-3";
 
   return (
     <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm transition-shadow hover:shadow-md">
@@ -41,14 +44,25 @@ export default function PromptCard({ prompt }) {
           </div>
         )}
         {prompt.visibility === "private" ? (
-          <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-linear-to-r from-amber-500 to-orange-500 px-2.5 py-1 text-xs font-semibold text-white shadow-md">
+          <span className={`absolute ${badgeSide} top-3 flex items-center gap-1 rounded-full bg-linear-to-r from-amber-500 to-orange-500 px-2.5 py-1 text-xs font-semibold text-white shadow-md`}>
             <Gem width={12} height={12} /> Premium
           </span>
         ) : (
-          <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-emerald-500/90 px-2.5 py-1 text-xs font-semibold text-white shadow-md backdrop-blur">
+          <span className={`absolute ${badgeSide} top-3 flex items-center gap-1 rounded-full bg-emerald-500/90 px-2.5 py-1 text-xs font-semibold text-white shadow-md backdrop-blur`}>
             <LockOpen width={12} height={12} /> Free
           </span>
         )}
+        {onRemove ? (
+          <button
+            type="button"
+            onClick={() => onRemove(prompt)}
+            aria-label="Remove from saved"
+            title="Remove from saved"
+            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur transition hover:bg-danger"
+          >
+            <TrashBin width={15} height={15} />
+          </button>
+        ) : null}
       </div>
 
       <div className="flex flex-1 flex-col p-5">

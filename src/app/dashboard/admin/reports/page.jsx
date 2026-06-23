@@ -9,6 +9,7 @@ import {
   CircleXmark,
   Bell,
   CircleCheck,
+  Eye,
 } from "@gravity-ui/icons";
 import { apiGet, apiPatch } from "@/lib/api";
 import PageHeader from "@/components/dashboard/PageHeader";
@@ -162,31 +163,40 @@ export default function AdminReportsPage() {
                     </div>
                   </div>
 
-                  {r.status === "open" ? (
-                    <div className="mt-4 flex flex-wrap justify-center gap-2 border-t border-border pt-4">
-                      <button
-                        onClick={() => act(r, "remove")}
-                        className="inline-flex items-center gap-1.5 rounded-full bg-danger px-4 py-2 text-xs font-semibold text-danger-foreground transition hover:bg-danger-hover"
-                      >
-                        <CircleXmark width={14} height={14} />
-                        Remove Prompt
-                      </button>
-                      <button
-                        onClick={() => act(r, "warn")}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-xs font-medium text-foreground transition hover:bg-surface-hover"
-                      >
-                        <Bell width={14} height={14} />
-                        Warn Creator
-                      </button>
-                      <button
-                        onClick={() => act(r, "dismiss")}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-success/40 bg-success-soft px-4 py-2 text-xs font-semibold text-success-soft-foreground transition hover:bg-success hover:text-success-foreground"
-                      >
-                        <CircleCheck width={14} height={14} />
-                        Dismiss
-                      </button>
-                    </div>
-                  ) : null}
+                  <div className="mt-4 flex flex-wrap justify-center gap-2 border-t border-border pt-4">
+                    <Link
+                      href={`/prompts/${r.promptId}`}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-xs font-medium text-foreground transition hover:bg-surface-hover hover:text-accent"
+                    >
+                      <Eye width={14} height={14} />
+                      View
+                    </Link>
+                    {r.status === "open" ? (
+                      <>
+                        <button
+                          onClick={() => act(r, "remove")}
+                          className="inline-flex items-center gap-1.5 rounded-full bg-danger px-4 py-2 text-xs font-semibold text-danger-foreground transition hover:bg-danger-hover"
+                        >
+                          <CircleXmark width={14} height={14} />
+                          Remove Prompt
+                        </button>
+                        <button
+                          onClick={() => act(r, "warn")}
+                          className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-xs font-medium text-foreground transition hover:bg-surface-hover"
+                        >
+                          <Bell width={14} height={14} />
+                          Warn Creator
+                        </button>
+                        <button
+                          onClick={() => act(r, "dismiss")}
+                          className="inline-flex items-center gap-1.5 rounded-full border border-success/40 bg-success-soft px-4 py-2 text-xs font-semibold text-success-soft-foreground transition hover:bg-success hover:text-success-foreground"
+                        >
+                          <CircleCheck width={14} height={14} />
+                          Dismiss
+                        </button>
+                      </>
+                    ) : null}
+                  </div>
                 </div>
               );
             })}

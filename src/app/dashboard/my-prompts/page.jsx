@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { toast } from "react-toastify";
-import { Pencil, TrashBin, Plus, ChartColumn } from "@gravity-ui/icons";
+import { Pencil, TrashBin, Plus, ChartColumn, Eye, Star } from "@gravity-ui/icons";
 import { apiGet, apiDelete } from "@/lib/api";
 import PageHeader from "@/components/dashboard/PageHeader";
 import PromptForm from "@/components/dashboard/PromptForm";
@@ -22,6 +22,7 @@ const statusStyles = {
 export default function MyPromptsPage() {
   const [prompts, setPrompts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState(null);
   const [analytics, setAnalytics] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -62,12 +63,12 @@ export default function MyPromptsPage() {
         title="My Prompts"
         subtitle="Manage the prompts you've created."
         action={
-          <Link
-            href="/dashboard/add-prompt"
+          <button
+            onClick={() => setCreating(true)}
             className="flex items-center gap-2 rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground transition hover:bg-accent-hover"
           >
             <Plus width={16} height={16} /> Add Prompt
-          </Link>
+          </button>
         }
       />
 
@@ -75,6 +76,14 @@ export default function MyPromptsPage() {
         <EmptyState
           title="No prompts yet"
           description="Create your first prompt to get started."
+          action={
+            <button
+              onClick={() => setCreating(true)}
+              className="flex items-center gap-2 rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground transition hover:bg-accent-hover"
+            >
+              <Plus width={16} height={16} /> Add Prompt
+            </button>
+          }
         />
       ) : (
         <div className="overflow-hidden rounded-2xl border border-border bg-surface">
@@ -86,7 +95,7 @@ export default function MyPromptsPage() {
                   <th className="px-5 py-3 font-medium">Category</th>
                   <th className="px-5 py-3 font-medium">Visibility</th>
                   <th className="px-5 py-3 font-medium">Status</th>
-                  <th className="px-5 py-3 font-medium">Copies</th>
+                  <th className="px-5 py-3 font-medium">Copies &amp; Rating</th>
                   <th className="px-5 py-3 text-center font-medium">Actions</th>
                 </tr>
               </thead>
@@ -114,17 +123,38 @@ export default function MyPromptsPage() {
                         {p.status}
                       </span>
                     </td>
-                    <td className="px-5 py-3 text-muted">{p.copyCount || 0}</td>
+                    <td className="px-5 py-3">
+                      <div className="flex items-center gap-2 whitespace-nowrap text-muted">
+                        <span>
+                          <span className="font-medium text-foreground">
+                            {p.copyCount || 0}
+                          </span>{" "}
+                          copies
+                        </span>
+                        <span className="text-border">|</span>
+                        {p.reviewCount > 0 ? (
+                          <span className="inline-flex items-center gap-1">
+                            <Star width={14} height={14} className="text-amber-400" />
+                            <span className="font-medium text-foreground">
+                              {(p.avgRating || 0).toFixed(1)}
+                            </span>
+                            <span className="text-xs">({p.reviewCount})</span>
+                          </span>
+                        ) : (
+                          <span className="text-xs">No reviews</span>
+                        )}
+                      </div>
+                    </td>
                     <td className="px-5 py-3">
                       <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => setAnalytics(p)}
-                          aria-label="Analytics"
-                          title="Analytics"
+                        <Link
+                          href={`/prompts/${p._id}`}
+                          aria-label="View"
+                          title="View"
                           className="rounded-md p-1.5 text-muted transition hover:bg-surface-hover hover:text-accent"
                         >
-                          <ChartColumn width={16} height={16} />
-                        </button>
+                          <Eye width={16} height={16} />
+                        </Link>
                         <button
                           onClick={() => setEditing(p)}
                           aria-label="Edit"
@@ -136,9 +166,18 @@ export default function MyPromptsPage() {
                         <button
                           onClick={() => setDeleteTarget(p)}
                           aria-label="Delete"
+                          title="Delete"
                           className="rounded-md p-1.5 text-muted transition hover:bg-surface-hover hover:text-danger"
                         >
                           <TrashBin width={16} height={16} />
+                        </button>
+                        <button
+                          onClick={() => setAnalytics(p)}
+                          aria-label="Analytics"
+                          title="Analytics"
+                          className="rounded-md p-1.5 text-muted transition hover:bg-surface-hover hover:text-accent"
+                        >
+                          <ChartColumn width={16} height={16} />
                         </button>
                       </div>
                     </td>
@@ -149,6 +188,18 @@ export default function MyPromptsPage() {
           </div>
         </div>
       )}
+
+      <Modal open={creating} onClose={() => setCreating(false)} title="Add Prompt" size="xl">
+        <div className="max-h-[70vh] overflow-y-auto pr-1">
+          <PromptForm
+            embedded
+            onSuccess={() => {
+              setCreating(false);
+              load();
+            }}
+          />
+        </div>
+      </Modal>
 
       <Modal open={!!editing} onClose={() => setEditing(null)} title="Edit Prompt" size="xl">
         <div className="max-h-[70vh] overflow-y-auto pr-1">

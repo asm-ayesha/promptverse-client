@@ -69,6 +69,11 @@ function PromptDetailsPage() {
     loadReviews();
   }, [id, loadReviews]);
 
+  // Send the user to checkout but remember where they came from, so we can
+  // return them to this exact prompt (with content unlocked) after paying.
+  const goToPayment = () =>
+    router.push(`/payment?returnUrl=${encodeURIComponent(pathname)}`);
+
   const requireLogin = () => {
     toast.info("Please log in to continue");
     router.push(authHref(pathname));
@@ -287,7 +292,7 @@ function PromptDetailsPage() {
                   </ul>
 
                   <button
-                    onClick={() => router.push("/payment")}
+                    onClick={goToPayment}
                     className="mt-1 inline-flex items-center gap-2 rounded-full bg-linear-to-r from-amber-500 to-orange-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-amber-500/25 transition hover:opacity-90"
                   >
                     <Gem width={16} height={16} /> Unlock Premium
@@ -474,7 +479,7 @@ function PromptDetailsPage() {
               </button>
             ) : (
               <button
-                onClick={() => router.push("/payment")}
+                onClick={goToPayment}
                 className="flex w-full items-center justify-center gap-2 rounded-full bg-linear-to-r from-amber-500 to-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-amber-500/25 transition hover:opacity-90"
               >
                 <Gem width={16} height={16} />
