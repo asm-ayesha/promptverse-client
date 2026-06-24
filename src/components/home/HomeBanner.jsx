@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Magnifier, ArrowRight, Sparkles, Rocket } from "@gravity-ui/icons";
 import { fadeInUp, staggerContainer } from "@/lib/motion";
+import Marquee from "react-fast-marquee";
 
 // Pool of tags — a random subset is shown on each visit.
 const TAG_POOL = [
@@ -131,22 +132,26 @@ export default function HomeBanner() {
         {/* Trending Tags (random) */}
         <motion.div
           variants={fadeInUp}
-          className="mt-6 flex flex-wrap items-center justify-center gap-2"
+          className="mt-6 flex items-center justify-center gap-2"
         >
-          <span className="text-xs text-muted">Trending:</span>
-          {tags.map((tag) => (
-            <motion.button
-              key={tag}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() =>
-                router.push(`/all-prompts?search=${encodeURIComponent(tag)}`)
-              }
-              className="rounded-full border border-border bg-surface px-3 py-1 text-xs text-muted transition hover:border-accent hover:text-accent"
-            >
-              {tag}
-            </motion.button>
-          ))}
+          <span className="shrink-0 text-xs text-muted">Trending:</span>
+          <div className="max-w-md overflow-hidden">
+            <Marquee gradient={false} speed={40} pauseOnHover>
+              {tags.map((tag) => (
+                <motion.button
+                  key={tag}
+                  whileHover={{ scale: 1.08 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() =>
+                    router.push(`/all-prompts?search=${encodeURIComponent(tag)}`)
+                  }
+                  className="mx-1 rounded-full border border-border bg-surface px-3 py-1 text-xs text-muted transition hover:border-accent hover:text-accent"
+                >
+                  {tag}
+                </motion.button>
+              ))}
+            </Marquee>
+          </div>
         </motion.div>
 
         {/* Call-To-Action Buttons */}

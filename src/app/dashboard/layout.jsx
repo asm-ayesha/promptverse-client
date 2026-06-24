@@ -1,7 +1,9 @@
-"use client";
-
 import ProtectedRoute from "@/components/ProtectedRoute";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
+
+export const metadata = {
+  title: "Dashboard",
+};
 
 export default function DashboardLayout({ children }) {
   return (

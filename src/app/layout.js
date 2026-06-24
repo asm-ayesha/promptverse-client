@@ -7,7 +7,11 @@ import Footer from "@/components/Footer";
 import AuthTokenSync from "@/components/AuthTokenSync";
 
 export const metadata = {
-  title: "PromptVerse - AI Prompt Marketplace",
+  title: {
+    default: "PromptVerse - AI Prompt Marketplace",
+    // Each page sets its own title; this appends the brand automatically.
+    template: "%s · PromptVerse",
+  },
   description:
     "Discover, share and sell high-quality AI prompts for ChatGPT, Midjourney, Claude and more.",
 };
