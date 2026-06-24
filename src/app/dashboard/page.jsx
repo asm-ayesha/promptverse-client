@@ -87,7 +87,6 @@ export default function DashboardOverview() {
 
   return (
     <div className="space-y-8">
-      {/* Welcome banner */}
       <div className="relative overflow-hidden rounded-2xl border border-border bg-linear-to-br from-indigo-500 via-blue-500 to-cyan-400 px-6 py-7 text-white md:px-8">
         <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
         <div className="relative">
@@ -103,7 +102,6 @@ export default function DashboardOverview() {
         </div>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard label="My Prompts" value={stats.totalPrompts} icon={FileText} />
         <StatCard label="Saved Prompts" value={stats.saved} icon={Bookmark} />
@@ -120,7 +118,6 @@ export default function DashboardOverview() {
         />
       </div>
 
-      {/* Quick actions */}
       <div>
         <h2 className="mb-4 text-lg font-semibold text-foreground">Quick actions</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

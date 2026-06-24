@@ -53,7 +53,6 @@ const Navbar = () => {
           </span>
         </Link>
 
-        {/* Desktop Navigation */}
         <ul className="hidden items-center gap-8 md:flex">
           {navLinks.map((item) => (
             <li key={item.name}>
@@ -87,7 +86,6 @@ const Navbar = () => {
           ) : null}
         </ul>
 
-        {/* Desktop Actions */}
         <div className="hidden items-center gap-4 md:flex">
           <ThemeToggle />
           <div className="h-5 w-px bg-separator" />
@@ -136,7 +134,6 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile Actions */}
         <div className="flex items-center gap-3 md:hidden">
           <ThemeToggle />
           <button
@@ -149,7 +146,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {isOpen && (
         <div className="border-t border-border md:hidden">
           <div className="flex flex-col px-4 py-4">

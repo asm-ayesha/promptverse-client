@@ -87,7 +87,6 @@ function AllPromptsInner() {
 
   return (
     <div>
-      {/* Hero header */}
       <section className="relative overflow-hidden border-b border-border bg-grid">
         <div className="pointer-events-none absolute -left-24 top-0 h-72 w-72 rounded-full bg-accent/20 blur-3xl" />
         <div className="pointer-events-none absolute -right-24 bottom-0 h-72 w-72 rounded-full bg-sky-500/10 blur-3xl" />
@@ -133,7 +132,6 @@ function AllPromptsInner() {
 
       <div className="mx-auto max-w-7xl px-4 py-10 lg:px-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[260px_1fr]">
-          {/* Filters */}
           <aside className="h-fit lg:sticky lg:top-20">
             <div className="space-y-6 rounded-2xl border border-border bg-surface p-5">
               <div className="flex items-center justify-between">
@@ -172,9 +170,7 @@ function AllPromptsInner() {
             </div>
           </aside>
 
-          {/* Results */}
           <div>
-            {/* Toolbar */}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm text-muted">
                 {loading ? (
@@ -209,7 +205,6 @@ function AllPromptsInner() {
               </div>
             </div>
 
-            {/* Active filter chips */}
             {activeChips.length > 0 ? (
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 {activeChips.map((chip) => (

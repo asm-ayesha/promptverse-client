@@ -1,4 +1,3 @@
-// src/app/layout.js
 import { Providers } from "./providers";
 import { themeInitScript } from "./theme-script";
 import "./globals.css";

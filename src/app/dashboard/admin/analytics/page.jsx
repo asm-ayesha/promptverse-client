@@ -125,7 +125,6 @@ export default function AdminAnalyticsPage() {
         />
       </div>
 
-      {/* Full-width combined copy + revenue activity */}
       <div className="mt-6">
         <ChartCard title="Daily copies & revenue (platform-wide)">
           <ResponsiveContainer width="100%" height="100%">

@@ -158,7 +158,6 @@ function PromptDetailsPage() {
       </button>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_340px]">
-        {/* Main content */}
         <div className="min-w-0">
           <div className="overflow-hidden rounded-3xl border border-border bg-linear-to-br from-accent-soft/40 via-surface to-surface p-6 md:p-8">
             <div className="flex flex-wrap items-center gap-2">
@@ -220,7 +219,6 @@ function PromptDetailsPage() {
             </div>
           </div>
 
-          {/* Prompt content / premium lock */}
           <div className="mt-8">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-foreground">Prompt</h2>
@@ -247,7 +245,6 @@ function PromptDetailsPage() {
               </div>
             ) : (
               <div className="relative overflow-hidden rounded-2xl border border-amber-500/30 bg-linear-to-br from-amber-500/10 via-surface to-surface p-6 md:p-8">
-                {/* Decorative blurred "hidden content" bars */}
                 <div
                   aria-hidden
                   className="pointer-events-none absolute inset-0 space-y-3 p-6 opacity-50 blur-[5px]"
@@ -262,7 +259,6 @@ function PromptDetailsPage() {
                   )}
                 </div>
 
-                {/* Warm glow */}
                 <div className="pointer-events-none absolute -top-12 left-1/2 h-44 w-44 -translate-x-1/2 rounded-full bg-amber-500/20 blur-3xl" />
 
                 <div className="relative flex flex-col items-center justify-center gap-4 py-4 text-center">
@@ -313,7 +309,6 @@ function PromptDetailsPage() {
             </div>
           ) : null}
 
-          {/* Reviews */}
           <div className="mt-10">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-foreground">
@@ -412,7 +407,6 @@ function PromptDetailsPage() {
           </div>
         </div>
 
-        {/* Sidebar */}
         <aside className="h-fit space-y-4 lg:sticky lg:top-20">
           <div className="rounded-2xl border border-border bg-surface p-5">
             <div className="flex items-center gap-3">

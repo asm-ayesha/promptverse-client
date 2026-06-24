@@ -144,7 +144,6 @@ export default function PromptForm({ initial, onSuccess, embedded = false }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Step 1 — details */}
       <Section
         embedded={embedded}
         step="01"
@@ -187,7 +186,6 @@ export default function PromptForm({ initial, onSuccess, embedded = false }) {
         </Field>
       </Section>
 
-      {/* Step 2 — classification */}
       <Section
         embedded={embedded}
         step="02"
@@ -257,7 +255,6 @@ export default function PromptForm({ initial, onSuccess, embedded = false }) {
         </Field>
       </Section>
 
-      {/* Step 3 — extras */}
       <Section
         embedded={embedded}
         step="03"
@@ -333,7 +330,6 @@ export default function PromptForm({ initial, onSuccess, embedded = false }) {
         </Field>
       </Section>
 
-      {/* Submit bar */}
       <div
         className={`flex items-center justify-end gap-3 ${
           embedded

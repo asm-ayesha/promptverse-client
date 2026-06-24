@@ -123,7 +123,6 @@ export default function DashboardSidebar() {
 
   return (
     <>
-      {/* Mobile toggle */}
       <button
         onClick={() => setOpen(true)}
         className="mb-4 flex items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2 text-sm text-foreground lg:hidden"
@@ -131,13 +130,11 @@ export default function DashboardSidebar() {
         <Bars width={18} height={18} /> Menu
       </button>
 
-      {/* Desktop sidebar */}
       <aside className="sticky top-24 hidden h-fit w-64 shrink-0 self-start rounded-2xl border border-border bg-surface p-4 lg:block">
         <Profile />
         <NavList />
       </aside>
 
-      {/* Mobile drawer */}
       {open ? (
         <div className="fixed inset-0 z-100 lg:hidden">
           <div

@@ -63,7 +63,6 @@ export default function HomeBanner() {
     <section className="relative overflow-hidden bg-grid">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-linear-to-b from-accent-soft/40 via-background to-background" />
 
-      {/* Floating glow accents */}
       <motion.div
         aria-hidden
         animate={{ y: [0, -20, 0], opacity: [0.5, 0.8, 0.5] }}
@@ -107,7 +106,6 @@ export default function HomeBanner() {
           Claude and more. Copy, customize and create faster.
         </motion.p>
 
-        {/* Search Bar */}
         <motion.form
           variants={fadeInUp}
           onSubmit={search}
@@ -129,7 +127,6 @@ export default function HomeBanner() {
           </button>
         </motion.form>
 
-        {/* Trending Tags (random) */}
         <motion.div
           variants={fadeInUp}
           className="mt-6 flex items-center justify-center gap-2"
@@ -154,7 +151,6 @@ export default function HomeBanner() {
           </div>
         </motion.div>
 
-        {/* Call-To-Action Buttons */}
         <motion.div
           variants={fadeInUp}
           className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row"
